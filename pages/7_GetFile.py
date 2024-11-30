@@ -1,21 +1,22 @@
 import streamlit as st
+from openai import OpenAI
 
-Youtube_URL = st.text_input("Youtube_URL", 
-                        value=st.session_state.get('Youtube_URL',''))
+# api_key
+api_key = st.text_input("OpenAI API Key", 
+                        value=st.session_state.get('api_key',''),
+                        type='password')
 
-if Youtube_URL:
-    st.session_state['Youtube_URL'] = Youtube_URL
+if api_key:
+    st.session_state['api_key'] = api_key
+    if 'openai_client' in st.session_state:
+        client = st.session_state['openai_client']
+    else:
+        client = OpenAI(api_key=api_key)
+        st.session_state['openai_client'] = client
 
+youtube_url = st.text_input("youtube_url", 
+                        value=st.session_state.get('youtube_url',''))
 
-mp4_file = st.file_uploader("Upload a mp4 file", type=['mp4'], accept_multiple_files=False)
-if mp4_file is not None:
-    vector_store = client.beta.vector_stores.create(name="ChatPDF")
-    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-        vector_store_id=vector_store.id,
-        files=[mp4_file]
-    )
-    st.session_state.vector_store = vector_store
-
-if 'vector_store' not in st.session_state:
-    st.markdown("mp4 파일을 업로드하세요.")
-    st.stop()
+# youtube_url
+if youtube_url:
+    st.session_state['youtube_url'] = youtube_url
